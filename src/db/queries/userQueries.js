@@ -51,4 +51,21 @@ const getUserById = async (id) => {
     }
 }
 
-module.exports = {createUser, getUserByEmail, getUserById}
+const getTransactionsByUserId = async (userId) => {
+    const query = `
+        SELECT * FROM transactions
+        WHERE user_id = $1
+        ORDER BY created_at DESC;`;
+
+    const values = [userId]
+    
+    try{
+        const result = await pool.query(query, values);
+        return result.rows;
+    } catch (err){
+        console.error('Error executing getTransactionsByUserId query: ', err.stack);
+        throw err;
+    }
+}
+
+module.exports = {createUser, getUserByEmail, getUserById, getTransactionsByUserId}
