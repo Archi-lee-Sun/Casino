@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { WebSocketServer } = require('ws');
+const http = require('http');
 require('dotenv').config();
 
 const errorHandler = require('./src/middleware/errorHandler');
@@ -11,8 +13,10 @@ const slotsRoutes = require('./src/routes/slots');
 const crashRoutes = require('./src/routes/crash');
 const sportsRoutes = require('./src/routes/sports');
 const leaderboardRoutes = require('./src/routes/leaderboard');
-
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
 
 app.use(cors());
 app.use(express.json());
@@ -29,6 +33,8 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Casino server running on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Casino server running on port ${PORT}`);
 });
+
+module.exports = { wss };
