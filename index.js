@@ -13,10 +13,12 @@ const slotsRoutes = require('./src/routes/slots');
 const crashRoutes = require('./src/routes/crash');
 const sportsRoutes = require('./src/routes/sports');
 const leaderboardRoutes = require('./src/routes/leaderboard');
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
+const { crashClients, startGameLoop } = require('./src/controllers/crashController');
 
 app.use(cors());
 app.use(express.json());
@@ -33,8 +35,26 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
+wss.on('connection', (ws) => {
+    ws.on('message', (message) => {
+        try {
+            const data = JSON.parse(message);
+            if (data.type === 'join_crash') {
+                crashClients.add(ws);
+            }
+        } catch (error) {
+            console.error('Socket message error:', error);
+        }
+    });
+
+    ws.on('close', () => {
+        crashClients.delete(ws);
+    });
+});
+
 server.listen(PORT, () => {
     console.log(`Casino server running on port ${PORT}`);
+    startGameLoop(wss);
 });
 
 module.exports = { wss };

@@ -57,8 +57,26 @@ const updateBetLoss = async (roundId) => {
         throw error;
     }
 }
+
+const getBetByUserAndRound = async (userId, roundId) => {
+    const query = `
+        SELECT * FROM bets
+        WHERE user_id = $1 AND meta->>'round_id' = $2 AND status = 'pending'
+    `;
+    const values = [userId, roundId.toString()];
+    try {
+        const result = await pool.query(query, values);
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error fetching bet:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
     insertBet,
     updateBetCashout,
-    updateBetLoss
+    updateBetLoss,
+    getBetByUserAndRound
 }
