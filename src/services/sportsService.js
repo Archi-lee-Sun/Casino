@@ -24,9 +24,23 @@ const getUpcomingMatches = async () => {
     }
 }
 
+const getMatchOdds = async (fixtureId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/odds`, {
+            params: { fixture: fixtureId },
+            headers
+        });
+        return response.data.response;
+    } catch (error) {
+        console.error('Error fetching match odds:', error);
+        throw error;
+    }
+}
+
 
 
 
 module.exports = {
-    getUpcomingMatches
+    getUpcomingMatches,
+    getMatchOdds
 }
