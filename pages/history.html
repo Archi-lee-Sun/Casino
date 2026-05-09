@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction History — Lucid Casino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <style>
+    .history-header {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+      position: relative;
+    }
+
+    .history-header::after {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7b2d8b, #e63946, transparent);
+      margin: 1.5rem auto 0;
+      width: 50%;
+      animation: headerLine 4s ease-in-out infinite;
+    }
+
+    @keyframes headerLine {
+      0%, 100% { width: 30%; opacity: 0.5; }
+      50% { width: 60%; opacity: 1; }
+    }
+
+    .history-subtitle {
+      font-family: 'Space Mono', monospace;
+      color: rgba(201,168,76,0.7);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .history-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 4rem;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      padding: 0.4rem 1rem;
+      border: 1px solid rgba(245,230,211,0.15);
+      background: transparent;
+      color: rgba(245,230,211,0.5);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.25s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: #f4a611;
+      color: #f4a611;
+      box-shadow: 0 0 10px rgba(244,166,17,0.15);
+    }
+
+    .filter-btn.active {
+      background: rgba(244,166,17,0.08);
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-card {
+      padding: 1.2rem 1.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: cardIn 0.5s ease forwards;
+    }
+
+    .summary-card:nth-child(1) { animation-delay: 0.1s; }
+    .summary-card:nth-child(2) { animation-delay: 0.2s; }
+    .summary-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .summary-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(245,230,211,0.35);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .summary-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .summary-value.positive { color: #4a7c59; }
+    .summary-value.negative { color: #e63946; }
+    .summary-value.neutral { color: #c9a84c; }
+
+    .transactions-table-wrap {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .table-head {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 2fr 1.2fr;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .th {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(245,230,211,0.3);
+    }
+
+    .th:last-child { text-align: right; }
+
+    .transaction-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 2fr 1.2fr;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      align-items: center;
+      transition: background 0.2s;
+      opacity: 0;
+      animation: rowFadeIn 0.4s ease forwards;
+    }
+
+    .transaction-row:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-row:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    @keyframes rowFadeIn {
+      to { opacity: 1; }
+    }
+
+    .tx-type {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tx-type-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .icon-win { background: rgba(74,124,89,0.2); border: 1px solid rgba(74,124,89,0.4); }
+    .icon-bet { background: rgba(230,57,70,0.15); border: 1px solid rgba(230,57,70,0.3); }
+    .icon-bonus { background: rgba(244,166,17,0.15); border: 1px solid rgba(244,166,17,0.3); }
+    .icon-deposit { background: rgba(123,45,139,0.2); border: 1px solid rgba(123,45,139,0.4); }
+    .icon-withdrawal { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); }
+    .icon-other { background: rgba(245,230,211,0.05); border: 1px solid rgba(245,230,211,0.1); }
+
+    .tx-type-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(245,230,211,0.6);
+    }
+
+    .tx-amount {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .amount-positive { color: #4a7c59; }
+    .amount-negative { color: #e63946; }
+
+    .tx-description {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: rgba(245,230,211,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tx-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(245,230,211,0.3);
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: rgba(245,230,211,0.3);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(245,230,211,0.2);
+      letter-spacing: 0.1em;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      font-family: 'Space Mono', monospace;
+      color: rgba(245,230,211,0.4);
+      letter-spacing: 0.1em;
+    }
+
+    .loading-state .spinner {
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(123,45,139,0.2);
+      border-top-color: #7b2d8b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .page-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid rgba(245,230,211,0.1);
+      background: transparent;
+      color: rgba(245,230,211,0.4);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover, .page-btn.active {
+      border-color: #7b2d8b;
+      color: #f5e6d3;
+      background: rgba(123,45,139,0.15);
+    }
+
+    .page-info {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: rgba(245,230,211,0.25);
+      letter-spacing: 0.1em;
+    }
+
+    .back-nav {
+      position: fixed;
+      top: 1.5rem;
+      left: 2rem;
+      z-index: 100;
+    }
+
+    .back-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(245,230,211,0.5);
+      text-decoration: none;
+      border: 1px solid rgba(245,230,211,0.15);
+      padding: 0.5rem 1rem;
+      border-radius: 2px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+      color: #7b2d8b;
+      border-color: #7b2d8b;
+      box-shadow: 0 0 15px rgba(123,45,139,0.2);
+    }
+
+    .error-msg {
+      text-align: center;
+      padding: 2rem;
+      color: #e63946;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="grain-overlay"></div>
+  <div class="bg-gradient-shift"></div>
+
+  <nav class="back-nav">
+    <a href="dashboard.html" class="back-btn">← Dashboard</a>
+  </nav>
+
+  <div class="page-content">
+    <header class="history-header">
+      <h1 class="page-title" style="font-size: clamp(2rem, 5vw, 4rem);">The Ledger</h1>
+      <p class="history-subtitle">Every Wager, Every Win, Every Dream</p>
+    </header>
+
+    <div class="history-container">
+      <div class="summary-cards" id="summaryCards" style="display:none;">
+        <div class="summary-card">
+          <span class="summary-label">Total Won</span>
+          <span class="summary-value positive" id="totalWon">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Total Bet</span>
+          <span class="summary-value negative" id="totalBet">—</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Transactions</span>
+          <span class="summary-value neutral" id="txCount">—</span>
+        </div>
+      </div>
+
+      <div class="filter-bar" id="filterBar" style="display:none;">
+        <span style="font-family:'Space Mono',monospace;font-size:0.6rem;color:rgba(245,230,211,0.3);letter-spacing:0.15em;text-transform:uppercase;">Filter:</span>
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="win">Wins</button>
+        <button class="filter-btn" data-filter="bet">Bets</button>
+        <button class="filter-btn" data-filter="bonus">Bonus</button>
+        <button class="filter-btn" data-filter="deposit">Deposits</button>
+      </div>
+
+      <div id="historyContent">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Consulting the ledger...</p>
+        </div>
+      </div>
+
+      <div class="pagination" id="pagination" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/history.js"></script>
+</body>
+</html>

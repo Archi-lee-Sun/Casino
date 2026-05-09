@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Betting — Lucid Casino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/sports.css" />
+</head>
+<body>
+  <div class="grain-overlay"></div>
+  <div class="bg-gradient-shift"></div>
+
+  <nav class="back-nav">
+    <a href="dashboard.html" class="back-btn">← Dashboard</a>
+  </nav>
+
+  <div class="page-content">
+    <header class="sports-header">
+      <h1 class="page-title">The Fixture</h1>
+      <p class="sports-subtitle">Place Your Allegiance on the Beautiful Game</p>
+    </header>
+
+    <div class="sports-container">
+      <div class="balance-ticker" id="balanceTicker">
+        <span class="ticker-label">Current Balance</span>
+        <span class="ticker-value" id="balanceDisplay">—</span>
+      </div>
+
+      <div class="matches-grid" id="matchesGrid">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Fetching the fixtures...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bet Modal -->
+  <div class="modal-overlay" id="betModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose">✕</button>
+
+      <div class="modal-header">
+        <div class="modal-match-info" id="modalMatchInfo">
+          <span class="modal-teams" id="modalTeams">Team A vs Team B</span>
+          <span class="modal-selection" id="modalSelection">Home Win</span>
+        </div>
+        <div class="modal-odds-display">
+          <span class="modal-odds-label">Odds</span>
+          <span class="modal-odds-value" id="modalOdds">—</span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <label class="field-label">Wager Amount</label>
+        <div class="bet-input-group">
+          <span class="currency-symbol">$</span>
+          <input type="number" id="betAmountInput" class="bet-amount-field" min="10" value="100" placeholder="100" />
+        </div>
+
+        <div class="quick-amounts">
+          <button class="quick-btn" data-amount="50">$50</button>
+          <button class="quick-btn" data-amount="100">$100</button>
+          <button class="quick-btn" data-amount="250">$250</button>
+          <button class="quick-btn" data-amount="500">$500</button>
+        </div>
+
+        <div class="payout-preview">
+          <span class="payout-label">Potential Payout</span>
+          <span class="payout-value" id="payoutPreview">$0.00</span>
+        </div>
+
+        <div id="modalError" class="form-error" style="display:none;"></div>
+
+        <button class="confirm-bet-btn" id="confirmBetBtn">
+          <span id="confirmBtnText">Place Bet</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win/Lose notification -->
+  <div class="bet-notification" id="betNotification" style="display:none;">
+    <div class="notification-inner" id="notificationInner"></div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/sports.js"></script>
+</body>
+</html>

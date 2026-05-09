@@ -1,0 +1,436 @@
+/* ============================================================
+   crash.css — Dark Atmospheric Crash Game
+   ============================================================ */
+
+.crash-page {
+  min-height: 100vh;
+  padding: 80px 40px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Game Arena ── */
+.crash-arena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  position: relative;
+}
+
+/* ── State Badge ── */
+.crash-state-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  transition: all var(--transition-med);
+}
+
+.state-waiting {
+  background: rgba(244,166,17,0.15);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(244,166,17,0.4);
+  box-shadow: 0 0 20px rgba(244,166,17,0.2);
+}
+
+.state-running {
+  background: rgba(74,124,89,0.15);
+  color: #7bc991;
+  border: 1px solid rgba(74,124,89,0.4);
+  box-shadow: 0 0 20px rgba(74,124,89,0.2);
+}
+
+.state-crashed {
+  background: rgba(230,57,70,0.2);
+  color: var(--accent-red);
+  border: 1px solid rgba(230,57,70,0.5);
+  box-shadow: 0 0 30px rgba(230,57,70,0.4);
+  animation: crashBadgePulse 0.5s ease-in-out 6;
+}
+
+@keyframes crashBadgePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Countdown ── */
+.crash-countdown {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--accent-yellow);
+  text-align: center;
+  height: 24px;
+  transition: opacity var(--transition-fast);
+}
+
+/* ── MULTIPLIER — THE CENTER OF THE UNIVERSE ── */
+.multiplier-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.multiplier-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0.1);
+  animation: ringPulse 3s ease-in-out infinite;
+}
+
+.multiplier-ring:nth-child(1) { width: 300px; height: 300px; animation-delay: 0s; }
+.multiplier-ring:nth-child(2) { width: 380px; height: 380px; animation-delay: 0.5s; opacity: 0.6; }
+.multiplier-ring:nth-child(3) { width: 460px; height: 460px; animation-delay: 1s; opacity: 0.3; }
+
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: var(--ring-opacity, 0.2); }
+  50%       { transform: scale(1.05); opacity: 0.4; }
+}
+
+.multiplier-display {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: clamp(5rem, 12vw, 10rem);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  color: var(--text-cream);
+  text-shadow: 0 0 60px rgba(255,255,255,0.2);
+  transition: color var(--transition-fast), text-shadow var(--transition-fast);
+  animation: multiplierBreathe 4s ease-in-out infinite;
+  letter-spacing: -0.04em;
+  padding: 40px 0;
+  min-width: 280px;
+}
+
+@keyframes multiplierBreathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.02); }
+}
+
+.multiplier-display.state-waiting {
+  color: var(--accent-yellow);
+  text-shadow: 0 0 60px rgba(244,166,17,0.4);
+  animation: multiplierBreathe 4s ease-in-out infinite;
+}
+
+.multiplier-display.state-running {
+  color: #7bc991;
+  text-shadow: 0 0 80px rgba(74,124,89,0.6), 0 0 160px rgba(74,124,89,0.2);
+  animation: multiplierGrow 0.1s ease-in-out infinite;
+}
+
+@keyframes multiplierGrow {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.015); }
+}
+
+.multiplier-display.state-crashed {
+  color: var(--accent-red);
+  text-shadow: 0 0 80px rgba(230,57,70,0.8), 0 0 160px rgba(230,57,70,0.4);
+  animation: crashFlash 0.2s ease-in-out 8;
+}
+
+@keyframes crashFlash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.98); }
+}
+
+.multiplier-x {
+  font-size: 0.45em;
+  opacity: 0.7;
+  vertical-align: middle;
+}
+
+/* ── Arc Graph ── */
+.crash-graph {
+  width: 100%;
+  max-width: 600px;
+  height: 120px;
+  position: relative;
+  margin: 8px 0 24px;
+  overflow: hidden;
+}
+
+.crash-graph-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent-green), #7bc991);
+  box-shadow: 0 0 10px rgba(74,124,89,0.7);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  transform-origin: left center;
+}
+
+.crash-graph-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  background: linear-gradient(to top, rgba(74,124,89,0.15), transparent);
+  height: 100%;
+  transition: background var(--transition-fast);
+}
+
+.crash-graph-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7bc991;
+  box-shadow: 0 0 20px rgba(74,124,89,0.8);
+  transform: translate(50%, 50%);
+  transition: all var(--transition-fast);
+}
+
+.crash-graph.crashed .crash-graph-line {
+  background: linear-gradient(90deg, var(--accent-red), #ff6b76);
+  box-shadow: 0 0 20px rgba(230,57,70,0.7);
+}
+
+.crash-graph.crashed .crash-graph-fill {
+  background: linear-gradient(to top, rgba(230,57,70,0.15), transparent);
+}
+
+.crash-graph.crashed .crash-graph-dot {
+  background: var(--accent-red);
+  box-shadow: 0 0 30px rgba(230,57,70,0.9);
+}
+
+/* ── Bottom Controls ── */
+.crash-controls {
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  padding: 0 20px 40px;
+}
+
+.crash-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  position: relative;
+}
+
+.crash-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+}
+
+.crash-panel-title {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.crash-bet-input {
+  font-size: 2rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-yellow);
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--border-subtle);
+  outline: none;
+  width: 100%;
+  padding: 8px 0;
+  margin-bottom: 20px;
+  transition: border-color var(--transition-fast);
+}
+
+.crash-bet-input:focus {
+  border-bottom-color: var(--text-gold);
+}
+
+.crash-bet-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.bet-quick-btn {
+  padding: 6px 12px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.bet-quick-btn:hover {
+  background: rgba(201,168,76,0.15);
+  color: var(--text-gold);
+  border-color: var(--border-glow);
+}
+
+.place-bet-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--accent-green), #3a6347);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--glow-green);
+  animation: betBtnPulse 3s ease-in-out infinite;
+}
+
+@keyframes betBtnPulse {
+  0%, 100% { box-shadow: var(--glow-green); }
+  50%       { box-shadow: 0 0 40px rgba(74,124,89,0.7); }
+}
+
+.place-bet-btn:hover {
+  animation: none;
+  box-shadow: 0 0 50px rgba(74,124,89,0.8);
+  transform: translateY(-2px);
+}
+
+.place-bet-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  animation: none;
+  transform: none;
+}
+
+/* ── CASHOUT BUTTON — Psychologically Unmissable ── */
+.cashout-btn {
+  display: none;
+  width: 100%;
+  padding: 24px;
+  background: linear-gradient(135deg, #e63946, #8b0000);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  font-style: italic;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 60px rgba(230,57,70,0.7);
+  animation: cashoutUrge 0.8s ease-in-out infinite alternate;
+  text-transform: uppercase;
+}
+
+@keyframes cashoutUrge {
+  0%   { box-shadow: 0 0 40px rgba(230,57,70,0.5); transform: scale(1); }
+  100% { box-shadow: 0 0 100px rgba(230,57,70,1); transform: scale(1.04); }
+}
+
+.cashout-btn.visible {
+  display: block;
+}
+
+.cashout-btn:hover {
+  animation: none;
+  box-shadow: 0 0 120px rgba(230,57,70,1);
+  transform: scale(1.06);
+}
+
+.cashout-potential {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-style: normal;
+  opacity: 0.8;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ── Stats Panel ── */
+.crash-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+}
+
+.crash-stat:last-child { border-bottom: none; }
+
+.crash-stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+.crash-stat-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-cream);
+}
+
+/* ── History Chips ── */
+.crash-history {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto 24px;
+  padding: 0 20px;
+  justify-content: center;
+}
+
+.history-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.chip-low  { background: rgba(230,57,70,0.2);  color: #ff6b76;          border: 1px solid rgba(230,57,70,0.3); }
+.chip-mid  { background: rgba(244,166,17,0.2); color: var(--accent-yellow); border: 1px solid rgba(244,166,17,0.3); }
+.chip-high { background: rgba(74,124,89,0.2);  color: #7bc991;          border: 1px solid rgba(74,124,89,0.3); }
+
+/* ── Page-level crash flash ── */
+.crash-page.crashed-overlay {
+  animation: pageRedFlash 0.4s ease-in-out 3;
+}
+
+@keyframes pageRedFlash {
+  0%, 100% { background: transparent; }
+  50%       { background: rgba(230,57,70,0.05); }
+}
+
+@media (max-width: 600px) {
+  .crash-controls { grid-template-columns: 1fr; }
+  .multiplier-display { font-size: clamp(4rem, 18vw, 7rem); }
+}

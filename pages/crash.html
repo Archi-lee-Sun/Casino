@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crash — Lucid Casino</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/crash.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <nav class="nav-bar">
+      <a href="/pages/dashboard.html" class="nav-logo">Lucid</a>
+      <ul class="nav-links">
+        <li><a href="/pages/slots.html">Slots</a></li>
+        <li><a href="/pages/crash.html" class="active">Crash</a></li>
+        <li><a href="/pages/sports.html">Sports</a></li>
+        <li><a href="/pages/leaderboard.html">Ranks</a></li>
+        <li><a href="/pages/history.html">History</a></li>
+      </ul>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="nav-balance">₪ <span id="nav-balance-val" data-balance>—</span></div>
+        <button class="btn btn-sm btn-outline" onclick="logout()">Exit</button>
+      </div>
+    </nav>
+
+    <div class="crash-page page-content" id="crash-page">
+
+      <!-- Arena: the center of the universe -->
+      <div class="crash-arena">
+
+        <div class="crash-state-badge state-waiting" id="state-badge">WAITING</div>
+        <div class="crash-countdown" id="crash-countdown">Next round starting...</div>
+
+        <div class="multiplier-wrap">
+          <div class="multiplier-ring"></div>
+          <div class="multiplier-ring"></div>
+          <div class="multiplier-ring"></div>
+
+          <div class="multiplier-display state-waiting" id="multiplier-display">
+            1.00<span class="multiplier-x">×</span>
+          </div>
+        </div>
+
+        <!-- CSS Arc Graph -->
+        <div class="crash-graph" id="crash-graph">
+          <div class="crash-graph-fill" id="graph-fill"></div>
+          <div class="crash-graph-line" id="graph-line"></div>
+          <div class="crash-graph-dot" id="graph-dot"></div>
+        </div>
+
+        <!-- Recent history chips -->
+        <div class="crash-history" id="crash-history">
+          <div class="history-chip chip-mid">2.14×</div>
+          <div class="history-chip chip-high">7.83×</div>
+          <div class="history-chip chip-low">1.02×</div>
+          <div class="history-chip chip-high">4.55×</div>
+          <div class="history-chip chip-mid">2.91×</div>
+        </div>
+
+      </div>
+
+      <!-- Controls Grid -->
+      <div class="crash-controls">
+
+        <!-- Bet Panel -->
+        <div class="crash-panel">
+          <div class="crash-panel-title">Place Your Bet</div>
+
+          <input type="number" class="crash-bet-input" id="crash-bet" value="100" min="10" max="50000" />
+
+          <div class="crash-bet-btns">
+            <button class="bet-quick-btn" onclick="setCrashBet(50)">50</button>
+            <button class="bet-quick-btn" onclick="setCrashBet(100)">100</button>
+            <button class="bet-quick-btn" onclick="setCrashBet(250)">250</button>
+            <button class="bet-quick-btn" onclick="setCrashBet(500)">500</button>
+            <button class="bet-quick-btn" onclick="setCrashBet(1000)">1K</button>
+          </div>
+
+          <button class="place-bet-btn" id="place-bet-btn">
+            Place Bet
+          </button>
+        </div>
+
+        <!-- Info / Cashout Panel -->
+        <div class="crash-panel">
+          <div class="crash-panel-title">Active Bet</div>
+
+          <button class="cashout-btn" id="cashout-btn">
+            CASH OUT
+            <span class="cashout-potential" id="cashout-potential">₪ —</span>
+          </button>
+
+          <div id="stats-container">
+            <div class="crash-stat">
+              <span class="crash-stat-label">Balance</span>
+              <span class="crash-stat-value">₪ <span id="balance-display" data-balance>—</span></span>
+            </div>
+            <div class="crash-stat">
+              <span class="crash-stat-label">My Bet</span>
+              <span class="crash-stat-value" id="my-bet-display">—</span>
+            </div>
+            <div class="crash-stat">
+              <span class="crash-stat-label">Potential</span>
+              <span class="crash-stat-value glow-green" id="potential-display">—</span>
+            </div>
+            <div class="crash-stat">
+              <span class="crash-stat-label">Last Result</span>
+              <span class="crash-stat-value" id="last-result-display">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/crash.js"></script>
+</body>
+</html>

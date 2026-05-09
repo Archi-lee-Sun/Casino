@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slots — Lucid Casino</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/slots.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <nav class="nav-bar">
+      <a href="/pages/dashboard.html" class="nav-logo">Lucid</a>
+      <ul class="nav-links">
+        <li><a href="/pages/slots.html" class="active">Slots</a></li>
+        <li><a href="/pages/crash.html">Crash</a></li>
+        <li><a href="/pages/sports.html">Sports</a></li>
+        <li><a href="/pages/leaderboard.html">Ranks</a></li>
+        <li><a href="/pages/history.html">History</a></li>
+      </ul>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="nav-balance">₪ <span id="nav-balance-val" data-balance>—</span></div>
+        <button class="btn btn-sm btn-outline" onclick="logout()">Exit</button>
+      </div>
+    </nav>
+
+    <div class="slots-page page-content">
+
+      <div class="slots-header stagger-1">
+        <h1>The Oracle</h1>
+        <p>Three reels. Seven symbols. Infinite possibility.</p>
+      </div>
+
+      <!-- Machine Frame -->
+      <div class="machine-frame stagger-2" id="machine-frame">
+
+        <!-- Top decorative lamps -->
+        <div class="machine-top">
+          <div class="machine-lamp"></div>
+          <div class="machine-lamp"></div>
+          <div class="machine-title-plate">✦ LUCID FEVER DREAM ✦</div>
+          <div class="machine-lamp"></div>
+          <div class="machine-lamp"></div>
+        </div>
+
+        <!-- Reels -->
+        <div class="reels-container" id="reels-container">
+          <div class="win-line" id="win-line"></div>
+
+          <div class="reel" id="reel-0">
+            <div class="reel-inner" id="reel-inner-0">
+              <div class="reel-symbol"><span>🍋</span></div>
+              <div class="reel-symbol middle"><span>⭐</span></div>
+              <div class="reel-symbol"><span>🍒</span></div>
+            </div>
+          </div>
+
+          <div class="reel" id="reel-1">
+            <div class="reel-inner" id="reel-inner-1">
+              <div class="reel-symbol"><span>💎</span></div>
+              <div class="reel-symbol middle"><span>🍋</span></div>
+              <div class="reel-symbol"><span>⭐</span></div>
+            </div>
+          </div>
+
+          <div class="reel" id="reel-2">
+            <div class="reel-inner" id="reel-inner-2">
+              <div class="reel-symbol"><span>🍒</span></div>
+              <div class="reel-symbol middle"><span>7️⃣</span></div>
+              <div class="reel-symbol"><span>💎</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="slots-controls">
+
+          <div class="bet-section">
+            <span class="bet-label">Bet ₪</span>
+            <button class="bet-adj" id="bet-down">−</button>
+            <input type="number" class="bet-input" id="bet-amount" value="50" min="10" max="10000" />
+            <button class="bet-adj" id="bet-up">+</button>
+          </div>
+
+          <div class="spin-btn-wrap">
+            <button class="spin-btn" id="spin-btn">SPIN</button>
+          </div>
+
+          <!-- Result Display -->
+          <div class="result-display" id="result-display">
+            <div class="result-idle" style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">Awaiting your spin...</div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Stats -->
+      <div class="slots-stats stagger-3">
+        <div class="stat-item">
+          <span class="stat-label">Balance</span>
+          <span class="stat-value">₪ <span id="balance-display" data-balance>0.00</span></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Last Win</span>
+          <span class="stat-value" id="last-win-stat">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Spins</span>
+          <span class="stat-value" id="total-spins-stat">0</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Coin Rain Container -->
+  <div class="coin-rain" id="coin-rain"></div>
+
+  <script src="../js/api.js"></script>
+  <script src="../js/slots.js"></script>
+</body>
+</html>

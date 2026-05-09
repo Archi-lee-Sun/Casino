@@ -1,1847 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXUS — Casino</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --obsidian: #060609;
-    --void: #0a0a12;
-    --deep: #0f0f1a;
-    --surface: #13131f;
-    --surface2: #1a1a2e;
-    --surface3: #1f1f35;
-    --glass: rgba(255,255,255,0.04);
-    --glass2: rgba(255,255,255,0.07);
-    --glass3: rgba(255,255,255,0.12);
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.15);
-    --cyan: #00f5ff;
-    --cyan-dim: rgba(0,245,255,0.15);
-    --cyan-glow: rgba(0,245,255,0.3);
-    --pink: #ff2d78;
-    --pink-dim: rgba(255,45,120,0.15);
-    --pink-glow: rgba(255,45,120,0.3);
-    --violet: #7c3aed;
-    --violet-dim: rgba(124,58,237,0.2);
-    --gold: #f59e0b;
-    --gold-dim: rgba(245,158,11,0.15);
-    --green: #10b981;
-    --green-dim: rgba(16,185,129,0.15);
-    --text: #e8e8f0;
-    --text-muted: rgba(232,232,240,0.5);
-    --text-dim: rgba(232,232,240,0.3);
-    --font-display: 'Syne', sans-serif;
-    --font-body: 'Outfit', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--obsidian);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── LAVA LAMP BACKGROUND ── */
-  #bg-canvas {
-    position: fixed; inset: 0; z-index: 0;
-    pointer-events: none;
-  }
-
-  /* ── LAYOUT ── */
-  #app { position: relative; z-index: 1; min-height: 100vh; }
-
-  /* ── TYPOGRAPHY ── */
-  .font-display { font-family: var(--font-display); }
-  .font-mono { font-family: var(--font-mono); }
-
-  /* ── GLASS CARD ── */
-  .glass {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-  }
-
-  .glass-strong {
-    background: rgba(15,15,26,0.85);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-  }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 12px 24px; border-radius: var(--radius-sm);
-    font-family: var(--font-display); font-weight: 600; font-size: 14px;
-    letter-spacing: 0.5px; cursor: pointer; border: none; outline: none;
-    transition: all 0.2s ease; user-select: none;
-    text-transform: uppercase; position: relative; overflow: hidden;
-  }
-  .btn::after {
-    content: ''; position: absolute; inset: 0;
-    background: rgba(255,255,255,0); transition: background 0.2s;
-  }
-  .btn:hover::after { background: rgba(255,255,255,0.07); }
-  .btn:active { transform: scale(0.97); }
-
-  .btn-cyan {
-    background: linear-gradient(135deg, var(--cyan) 0%, #00b4d8 100%);
-    color: #000; box-shadow: 0 0 30px var(--cyan-glow);
-  }
-  .btn-pink {
-    background: linear-gradient(135deg, var(--pink) 0%, #c2185b 100%);
-    color: #fff; box-shadow: 0 0 30px var(--pink-glow);
-  }
-  .btn-ghost {
-    background: var(--glass2); color: var(--text);
-    border: 1px solid var(--border2);
-  }
-  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
-
-  .btn-xl {
-    padding: 20px 48px; font-size: 20px; border-radius: 14px;
-    letter-spacing: 2px;
-  }
-
-  /* ── INPUTS ── */
-  .input {
-    width: 100%; padding: 14px 16px;
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); color: var(--text);
-    font-family: var(--font-body); font-size: 15px; outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input:focus {
-    border-color: var(--cyan);
-    box-shadow: 0 0 0 3px var(--cyan-dim);
-  }
-  .input::placeholder { color: var(--text-dim); }
-
-  /* ── NAV ── */
-  #nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 16px 32px;
-    background: rgba(6,6,9,0.7);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
-  .nav-logo {
-    font-family: var(--font-display);
-    font-size: 22px; font-weight: 800;
-    letter-spacing: 4px; text-transform: uppercase;
-    background: linear-gradient(90deg, var(--cyan), var(--pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .nav-links { display: flex; gap: 4px; }
-
-  .nav-link {
-    padding: 8px 18px; border-radius: 8px;
-    font-family: var(--font-display); font-size: 13px;
-    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-    cursor: pointer; color: var(--text-muted);
-    transition: all 0.2s; border: 1px solid transparent;
-  }
-  .nav-link:hover { color: var(--text); background: var(--glass2); }
-  .nav-link.active {
-    color: var(--cyan); border-color: var(--cyan-dim);
-    background: var(--cyan-dim);
-  }
-
-  .nav-right { display: flex; align-items: center; gap: 16px; }
-
-  .balance-badge {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 16px; border-radius: 8px;
-    background: var(--glass); border: 1px solid var(--gold-dim);
-    font-family: var(--font-mono); font-size: 14px;
-    color: var(--gold);
-  }
-  .balance-badge .label { color: var(--text-dim); font-size: 11px; }
-
-  /* ── PAGES ── */
-  .page { display: none; padding-top: 80px; min-height: 100vh; }
-  .page.active { display: block; }
-
-  /* ── AUTH MODAL ── */
-  #auth-overlay {
-    display: none; position: fixed; inset: 0; z-index: 200;
-    background: rgba(6,6,9,0.9);
-    backdrop-filter: blur(20px);
-    align-items: center; justify-content: center;
-  }
-  #auth-overlay.active { display: flex; }
-
-  #auth-modal {
-    width: 440px; padding: 48px;
-    background: rgba(13,13,20,0.95);
-    border: 1px solid var(--border2);
-    border-radius: 24px;
-    box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 80px var(--violet-dim);
-    position: relative; overflow: hidden;
-  }
-  #auth-modal::before {
-    content: ''; position: absolute; top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(124,58,237,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 80%, rgba(0,245,255,0.05) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .auth-tab-bar {
-    display: flex; margin-bottom: 36px;
-    border-bottom: 1px solid var(--border);
-  }
-  .auth-tab {
-    flex: 1; padding: 12px; text-align: center;
-    font-family: var(--font-display); font-size: 13px; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--text-dim); cursor: pointer;
-    border-bottom: 2px solid transparent; margin-bottom: -1px;
-    transition: all 0.2s;
-  }
-  .auth-tab.active {
-    color: var(--cyan); border-bottom-color: var(--cyan);
-  }
-
-  .auth-form { display: none; }
-  .auth-form.active { display: block; }
-
-  .form-group { margin-bottom: 20px; }
-  .form-label {
-    display: block; margin-bottom: 8px;
-    font-size: 12px; font-weight: 600; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--text-muted);
-  }
-  .form-error { color: var(--pink); font-size: 12px; margin-top: 8px; }
-
-  /* ── LOBBY ── */
-  #lobby-page { padding: 100px 32px 32px; max-width: 1400px; margin: 0 auto; }
-
-  .lobby-hero {
-    text-align: center; padding: 60px 0 80px;
-  }
-  .lobby-hero h1 {
-    font-family: var(--font-display);
-    font-size: clamp(48px, 8vw, 96px);
-    font-weight: 800; line-height: 1;
-    letter-spacing: -2px;
-    background: linear-gradient(135deg, #fff 0%, var(--cyan) 40%, var(--pink) 80%, var(--violet) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 24px;
-  }
-  .lobby-hero p {
-    font-size: 18px; color: var(--text-muted);
-    max-width: 500px; margin: 0 auto 40px;
-  }
-
-  /* ── BENTO GRID ── */
-  .bento-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 16px;
-  }
-
-  .bento-card {
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
-    cursor: pointer; position: relative; overflow: hidden;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-  }
-  .bento-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border2);
-  }
-  .bento-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: var(--card-accent, transparent);
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .bento-card:hover::before { opacity: 1; }
-
-  .bento-card.crash-card {
-    grid-column: span 7;
-    --card-accent: radial-gradient(ellipse at 30% 50%, rgba(0,245,255,0.06) 0%, transparent 70%);
-  }
-  .bento-card.crash-card:hover { box-shadow: 0 20px 60px rgba(0,245,255,0.1); border-color: var(--cyan-glow); }
-
-  .bento-card.slots-card {
-    grid-column: span 5;
-    --card-accent: radial-gradient(ellipse at 70% 50%, rgba(255,45,120,0.06) 0%, transparent 70%);
-  }
-  .bento-card.slots-card:hover { box-shadow: 0 20px 60px rgba(255,45,120,0.1); border-color: var(--pink-glow); }
-
-  .bento-card.sports-card {
-    grid-column: span 4;
-    --card-accent: radial-gradient(ellipse at 50% 80%, rgba(16,185,129,0.06) 0%, transparent 70%);
-  }
-  .bento-card.sports-card:hover { box-shadow: 0 20px 60px rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); }
-
-  .bento-card.leaderboard-card {
-    grid-column: span 8;
-    --card-accent: radial-gradient(ellipse at 20% 50%, rgba(245,158,11,0.04) 0%, transparent 60%);
-  }
-
-  .card-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 10px; border-radius: 20px; margin-bottom: 16px;
-    font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-  }
-  .tag-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-glow); }
-  .tag-pink { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--pink-glow); }
-  .tag-green { background: var(--green-dim); color: var(--green); }
-  .tag-gold { background: var(--gold-dim); color: var(--gold); }
-
-  .card-title {
-    font-family: var(--font-display);
-    font-size: 28px; font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .card-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
-
-  .card-icon {
-    font-size: 64px; line-height: 1;
-    margin-bottom: 20px; display: block;
-    filter: drop-shadow(0 0 20px currentColor);
-  }
-
-  .mini-graph {
-    height: 60px; margin: 16px 0;
-    display: flex; align-items: flex-end; gap: 3px;
-  }
-  .mini-bar {
-    flex: 1; border-radius: 3px 3px 0 0;
-    background: linear-gradient(180deg, var(--cyan), transparent);
-    animation: barPulse 2s ease-in-out infinite;
-  }
-  @keyframes barPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-  }
-
-  .reel-preview {
-    display: flex; gap: 8px; margin: 16px 0;
-  }
-  .reel-col {
-    flex: 1; background: var(--glass2);
-    border-radius: 8px; padding: 8px 4px;
-    text-align: center; font-size: 24px;
-  }
-  .reel-sym { display: block; margin: 4px 0; }
-
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 12px; margin-bottom: 16px;
-  }
-  .stat-chip {
-    text-align: center; padding: 16px;
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-  }
-  .stat-value {
-    font-family: var(--font-display); font-size: 22px; font-weight: 700;
-    background: linear-gradient(90deg, var(--cyan), var(--pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-
-  /* ── LEADERBOARD ── */
-  .lb-row {
-    display: flex; align-items: center; gap: 16px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-  }
-  .lb-row:last-child { border-bottom: none; }
-  .lb-rank {
-    font-family: var(--font-mono); font-size: 14px;
-    color: var(--text-dim); width: 24px; text-align: center;
-  }
-  .lb-rank.gold { color: var(--gold); }
-  .lb-rank.silver { color: #94a3b8; }
-  .lb-rank.bronze { color: #cd7c3d; }
-  .lb-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--violet), var(--cyan));
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-weight: 700; font-size: 13px;
-    flex-shrink: 0;
-  }
-  .lb-name { flex: 1; font-weight: 500; }
-  .lb-amount {
-    font-family: var(--font-mono); font-size: 13px; color: var(--gold);
-  }
-
-  /* ══════════════════════════════════════
-     CRASH GAME
-  ══════════════════════════════════════ */
-  #crash-page { padding: 90px 24px 32px; max-width: 1300px; margin: 0 auto; }
-  #crash-page.active { display: flex; gap: 20px; align-items: flex-start; }
-
-  .crash-main { flex: 1; min-width: 0; }
-  .crash-sidebar { width: 320px; flex-shrink: 0; }
-
-  #crash-canvas-wrap {
-    width: 100%; aspect-ratio: 16/9;
-    background: rgba(6,6,9,0.9);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    overflow: hidden; position: relative;
-    margin-bottom: 16px;
-  }
-  #crash-canvas { width: 100%; height: 100%; display: block; }
-
-  .crash-multiplier {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-family: var(--font-display); font-size: clamp(48px, 8vw, 96px);
-    font-weight: 800; letter-spacing: -2px;
-    text-align: center; pointer-events: none;
-    transition: color 0.3s;
-  }
-  .crash-multiplier.flying { color: var(--cyan); text-shadow: 0 0 40px var(--cyan-glow), 0 0 80px var(--cyan-dim); }
-  .crash-multiplier.crashed { color: var(--pink); text-shadow: 0 0 40px var(--pink-glow); }
-  .crash-multiplier.waiting { color: var(--text-muted); font-size: 24px; letter-spacing: 2px; }
-
-  .crash-status-bar {
-    display: flex; gap: 12px; margin-bottom: 16px;
-  }
-  .crash-phase-pill {
-    padding: 6px 16px; border-radius: 20px; font-size: 12px;
-    font-family: var(--font-display); font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .phase-flying { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-glow); }
-  .phase-crashed { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--pink-glow); }
-  .phase-waiting { background: var(--glass2); color: var(--text-muted); border: 1px solid var(--border); }
-
-  .cashout-btn {
-    width: 100%; padding: 28px; font-size: 28px;
-    font-family: var(--font-display); font-weight: 800; letter-spacing: 3px;
-    text-transform: uppercase; border: none; border-radius: var(--radius);
-    cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
-    background: linear-gradient(135deg, var(--cyan) 0%, #0094c6 100%);
-    color: #000; box-shadow: 0 0 60px var(--cyan-glow), 0 20px 40px rgba(0,245,255,0.2);
-    text-shadow: none;
-  }
-  .cashout-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 0 100px var(--cyan-glow), 0 30px 60px rgba(0,245,255,0.3);
-  }
-  .cashout-btn:active { transform: scale(0.98); }
-  .cashout-btn:disabled {
-    background: var(--glass2); color: var(--text-dim);
-    box-shadow: none; cursor: not-allowed;
-    border: 1px solid var(--border);
-  }
-  .cashout-btn .sub { font-size: 13px; opacity: 0.7; display: block; margin-top: 4px; letter-spacing: 1px; }
-
-  .crash-bet-panel {
-    background: var(--glass); backdrop-filter: blur(20px);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 24px; margin-bottom: 16px;
-  }
-  .crash-bet-panel h3 {
-    font-family: var(--font-display); font-size: 14px; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
-  }
-
-  .bet-amount-input {
-    position: relative; margin-bottom: 16px;
-  }
-  .bet-amount-input .currency {
-    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-    color: var(--gold); font-family: var(--font-mono); font-weight: 500;
-  }
-  .bet-amount-input input {
-    padding-left: 40px; font-family: var(--font-mono);
-    font-size: 18px; color: var(--gold);
-  }
-
-  .quick-bets { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .quick-bet {
-    flex: 1; min-width: 52px; padding: 8px 4px; text-align: center;
-    background: var(--glass2); border: 1px solid var(--border);
-    border-radius: 8px; cursor: pointer; font-size: 12px;
-    font-family: var(--font-mono); color: var(--text-muted);
-    transition: all 0.2s;
-  }
-  .quick-bet:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
-
-  .auto-cashout-row {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  }
-  .auto-cashout-row label { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-  .auto-cashout-row input { flex: 1; font-family: var(--font-mono); }
-
-  .place-bet-btn {
-    width: 100%; padding: 16px; font-size: 16px;
-    font-family: var(--font-display); font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; border: none; border-radius: var(--radius-sm);
-    cursor: pointer; transition: all 0.2s;
-    background: linear-gradient(135deg, var(--pink), #8b005a);
-    color: #fff; box-shadow: 0 0 30px var(--pink-glow);
-  }
-  .place-bet-btn:hover { box-shadow: 0 0 50px var(--pink-glow); transform: translateY(-1px); }
-  .place-bet-btn:disabled {
-    background: var(--glass2); box-shadow: none; cursor: not-allowed;
-    color: var(--text-dim); transform: none;
-  }
-
-  /* Bets table */
-  .bets-live-table {
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: var(--radius); overflow: hidden;
-  }
-  .bets-live-table h3 {
-    padding: 16px 20px; font-family: var(--font-display); font-size: 13px;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .bets-table-row {
-    display: grid; grid-template-columns: 1fr 80px 80px;
-    padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-size: 13px; align-items: center;
-  }
-  .bets-table-row.header { color: var(--text-dim); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
-  .bets-table-row:last-child { border-bottom: none; }
-  .bet-won { color: var(--green); }
-  .bet-lost { color: var(--pink); }
-  .bet-active { color: var(--cyan); }
-
-  /* ══════════════════════════════════════
-     SLOTS
-  ══════════════════════════════════════ */
-  #slots-page { padding: 100px 24px 32px; max-width: 1100px; margin: 0 auto; }
-  #slots-page.active { display: block; }
-
-  .slots-machine {
-    background: rgba(10,10,18,0.9);
-    border: 1px solid var(--border2);
-    border-radius: 24px; padding: 32px;
-    position: relative; overflow: hidden;
-    box-shadow: 0 40px 120px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
-    margin-bottom: 24px;
-  }
-  .slots-machine::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--violet), var(--cyan), var(--pink));
-  }
-
-  .slots-title {
-    text-align: center; margin-bottom: 32px;
-    font-family: var(--font-display); font-size: 32px; font-weight: 800;
-    letter-spacing: 4px; text-transform: uppercase;
-    background: linear-gradient(90deg, var(--pink), var(--cyan));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .reels-wrap {
-    display: flex; gap: 12px; justify-content: center;
-    margin-bottom: 32px;
-  }
-
-  .reel {
-    width: 120px; height: 360px;
-    background: rgba(6,6,9,0.8);
-    border: 1px solid var(--border2);
-    border-radius: 12px; overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
-  }
-  .reel::before, .reel::after {
-    content: ''; position: absolute; left: 0; right: 0; z-index: 2;
-    height: 30%; pointer-events: none;
-  }
-  .reel::before {
-    top: 0;
-    background: linear-gradient(180deg, rgba(6,6,9,0.9) 0%, transparent 100%);
-  }
-  .reel::after {
-    bottom: 0;
-    background: linear-gradient(0deg, rgba(6,6,9,0.9) 0%, transparent 100%);
-  }
-
-  .reel-track {
-    display: flex; flex-direction: column; align-items: center;
-    transition: transform 0.0s linear;
-    will-change: transform;
-  }
-
-  .reel-symbol {
-    width: 120px; height: 120px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 56px; line-height: 1; flex-shrink: 0;
-    position: relative;
-  }
-  .reel-symbol.win-glow {
-    animation: symbolWin 0.5s ease-out forwards;
-  }
-  @keyframes symbolWin {
-    0% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.15); filter: brightness(2) drop-shadow(0 0 20px gold); }
-    100% { transform: scale(1); filter: brightness(1.5) drop-shadow(0 0 10px gold); }
-  }
-
-  /* Win line overlay */
-  .win-line {
-    position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
-    height: 122px; border: 2px solid var(--gold);
-    box-shadow: 0 0 20px var(--gold-dim), inset 0 0 20px var(--gold-dim);
-    border-radius: 4px; pointer-events: none; z-index: 3;
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .win-line.visible { opacity: 1; }
-
-  .slots-controls {
-    display: flex; align-items: center; gap: 16px; justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .bet-controls {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: 12px; padding: 8px 16px;
-  }
-  .bet-controls label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-  .bet-num {
-    font-family: var(--font-mono); font-size: 20px; color: var(--gold);
-    min-width: 60px; text-align: center;
-  }
-  .bet-adj {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: var(--glass2); border: 1px solid var(--border);
-    color: var(--text); font-size: 18px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-  }
-  .bet-adj:hover { border-color: var(--cyan); color: var(--cyan); }
-
-  #spin-btn {
-    width: 200px; height: 72px; font-size: 22px;
-    font-family: var(--font-display); font-weight: 800; letter-spacing: 3px;
-    border: none; border-radius: 14px; cursor: pointer;
-    background: linear-gradient(135deg, var(--pink) 0%, #c2185b 50%, var(--violet) 100%);
-    color: #fff; box-shadow: 0 0 50px var(--pink-glow), 0 20px 40px rgba(255,45,120,0.3);
-    transition: all 0.2s; text-transform: uppercase;
-    position: relative; overflow: hidden;
-  }
-  #spin-btn::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
-  }
-  #spin-btn:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 80px var(--pink-glow), 0 30px 60px rgba(255,45,120,0.4);
-  }
-  #spin-btn:active { transform: scale(0.97); }
-  #spin-btn:disabled {
-    background: var(--glass2); box-shadow: none;
-    cursor: not-allowed; color: var(--text-dim);
-    transform: none;
-  }
-
-  /* Slots win display */
-  .slots-win-display {
-    text-align: center; min-height: 60px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px;
-  }
-  .win-amount {
-    font-family: var(--font-display); font-size: 36px; font-weight: 800;
-    color: var(--gold); text-shadow: 0 0 30px var(--gold-dim);
-    animation: winBounce 0.5s ease-out;
-    display: none;
-  }
-  .win-amount.show { display: block; }
-  @keyframes winBounce {
-    0% { transform: scale(0.5); opacity: 0; }
-    60% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .no-win-text { color: var(--text-dim); font-size: 14px; }
-
-  /* Payouts table */
-  .payouts-table {
-    background: var(--glass); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 24px;
-  }
-  .payouts-table h3 {
-    font-family: var(--font-display); font-size: 14px;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
-    margin-bottom: 16px;
-  }
-  .payout-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .payout-row:last-child { border-bottom: none; }
-  .payout-syms { font-size: 22px; letter-spacing: 4px; }
-  .payout-mult {
-    font-family: var(--font-mono); color: var(--gold); font-size: 14px;
-  }
-
-  /* ── NOTIFICATION TOAST ── */
-  #toast {
-    position: fixed; bottom: 32px; right: 32px; z-index: 500;
-    padding: 16px 24px; border-radius: 12px;
-    font-family: var(--font-display); font-size: 14px; font-weight: 600;
-    letter-spacing: 0.5px; max-width: 320px;
-    transform: translateY(20px); opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.success {
-    background: rgba(16,185,129,0.2); border: 1px solid var(--green);
-    color: var(--green); box-shadow: 0 0 30px rgba(16,185,129,0.2);
-  }
-  #toast.error {
-    background: rgba(255,45,120,0.15); border: 1px solid var(--pink);
-    color: var(--pink); box-shadow: 0 0 30px var(--pink-dim);
-  }
-  #toast.info {
-    background: var(--cyan-dim); border: 1px solid var(--cyan);
-    color: var(--cyan); box-shadow: 0 0 30px var(--cyan-dim);
-  }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--void); }
-  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  .fade-in { animation: fadeIn 0.4s ease forwards; }
-
-  .loading-spinner {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-top-color: var(--cyan);
-    animation: spin 0.8s linear infinite;
-  }
-
-  /* Crash rocket animation */
-  @keyframes rocketFloat {
-    0%, 100% { transform: translate(-50%, -50%) rotate(-10deg); }
-    50% { transform: translate(-50%, -52%) rotate(-8deg); }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enter the Dream — Lucid Casino</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <style>
+    /* ── Auth Page Layout ── */
+    body { overflow: hidden; height: 100vh; }
+
+    .auth-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* LEFT — Pure Aesthetic */
+    .auth-left {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 60px;
+      background: linear-gradient(135deg, #0d0508 0%, #1a0a0f 40%, #200a18 70%, #0d0508 100%);
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 30% 30%, rgba(123,45,139,0.3) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 100% at 70% 80%, rgba(230,57,70,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 50% 50%, rgba(244,166,17,0.08) 0%, transparent 70%);
+      animation: leftGlow 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes leftGlow {
+      0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+      50%  { transform: scale(1.08) rotate(2deg); opacity: 0.8; }
+      100% { transform: scale(0.95) rotate(-1deg); opacity: 1.1; }
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(201,168,76,0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+
+    .auth-logo {
+      position: relative;
+      z-index: 1;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 900;
+      font-style: italic;
+      color: var(--text-cream);
+      text-shadow: 0 0 60px rgba(201,168,76,0.5), 0 0 120px rgba(123,45,139,0.3);
+      transform: rotate(-3deg);
+      line-height: 1;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-logo span {
+      display: block;
+      font-size: 0.4em;
+      font-weight: 400;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--text-gold);
+      transform: rotate(0deg);
+      margin-top: 8px;
+      text-shadow: none;
+      text-shadow: 0 0 20px rgba(201,168,76,0.5);
+    }
+
+    .quote-display {
+      position: relative;
+      z-index: 1;
+      margin-top: 60px;
+      max-width: 340px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .quote-text {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .quote-text.visible {
+      opacity: 1;
+    }
+
+    .quote-author {
+      display: block;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      font-family: var(--font-body);
+      font-style: normal;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: rgba(201,168,76,0.5);
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: orbFloat linear infinite;
+    }
+
+    .orb-1 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(123,45,139,0.3), transparent 70%);
+      top: 10%; left: -5%;
+      animation-duration: 18s;
+    }
+    .orb-2 {
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(230,57,70,0.2), transparent 70%);
+      bottom: 15%; right: -3%;
+      animation-duration: 14s;
+      animation-delay: -7s;
+    }
+    .orb-3 {
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(244,166,17,0.3), transparent 70%);
+      top: 60%; left: 15%;
+      animation-duration: 22s;
+      animation-delay: -3s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      33%       { transform: translateY(-30px) rotate(120deg); }
+      66%       { transform: translateY(20px) rotate(240deg); }
+    }
+
+    /* RIGHT — Form Side */
+    .auth-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 60px 60px 40px;
+      background: linear-gradient(145deg, var(--bg-mid), var(--bg-deep));
+      border-left: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .auth-form-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 14px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-med);
+      margin-bottom: -1px;
+    }
+
+    .auth-tab.active {
+      color: var(--text-gold);
+      border-bottom-color: var(--text-gold);
+    }
+
+    .auth-form-panel {
+      display: none;
+    }
+
+    .auth-form-panel.active {
+      display: block;
+      animation: fadeInUp 0.4s ease forwards;
+    }
+
+    .auth-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--text-cream);
+      margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .auth-footer button {
+      background: none;
+      border: none;
+      color: var(--text-gold);
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      body { overflow-y: auto; }
+      .auth-container { grid-template-columns: 1fr; height: auto; }
+      .auth-left { min-height: 280px; padding: 40px; }
+      .auth-right { padding: 40px 24px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="page-wrapper">
+    <div class="auth-container">
 
-<!-- Background -->
-<canvas id="bg-canvas"></canvas>
+      <!-- LEFT: Aesthetic -->
+      <div class="auth-left">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
 
-<div id="app">
-  <!-- NAV -->
-  <nav id="nav">
-    <div class="nav-logo">NEXUS</div>
-    <div class="nav-links">
-      <div class="nav-link active" onclick="showPage('lobby')">Lobby</div>
-      <div class="nav-link" onclick="showPage('crash')">Crash</div>
-      <div class="nav-link" onclick="showPage('slots')">Slots</div>
-    </div>
-    <div class="nav-right">
-      <div class="balance-badge" id="balance-display" style="display:none;">
-        <span class="label">Balance</span>
-        <span id="balance-amount" class="font-mono">$0.00</span>
-      </div>
-      <button class="btn btn-ghost" id="auth-btn" onclick="openAuth()">Sign In</button>
-      <button class="btn btn-cyan" style="display:none;" id="logout-btn" onclick="logout()">Exit</button>
-    </div>
-  </nav>
-
-  <!-- ── LOBBY PAGE ── -->
-  <div class="page active" id="lobby-page">
-    <div style="max-width: 1400px; margin: 0 auto; padding: 0 32px 32px;">
-      <div class="lobby-hero">
-        <h1>Enter the Dream</h1>
-        <p>Where neon meets fortune. Play in real-time, win beyond imagination.</p>
-        <button class="btn btn-cyan" style="font-size:16px; padding: 16px 40px;" onclick="openAuth()">
-          Start Playing
-        </button>
-      </div>
-
-      <!-- Stats -->
-      <div class="stats-row" style="margin-bottom:24px;">
-        <div class="stat-chip">
-          <div class="stat-value" id="stat-players">2,847</div>
-          <div class="stat-label">Online Now</div>
+        <div class="auth-logo stagger-1">
+          Lucid
+          <span>Casino Fever Dream</span>
         </div>
-        <div class="stat-chip">
-          <div class="stat-value">$1.2M</div>
-          <div class="stat-label">Total Wagered</div>
-        </div>
-        <div class="stat-chip">
-          <div class="stat-value" id="stat-jackpot">$48,220</div>
-          <div class="stat-label">Jackpot Pool</div>
-        </div>
-        <div class="stat-chip">
-          <div class="stat-value">97.3%</div>
-          <div class="stat-label">RTP</div>
+
+        <div class="quote-display stagger-3">
+          <div class="quote-text" id="quote-text">
+            "The dream is the small hidden door in the deepest and most intimate sanctum of the soul."
+          </div>
+          <span class="quote-author" id="quote-author">— C.G. Jung</span>
         </div>
       </div>
 
-      <!-- Bento Grid -->
-      <div class="bento-grid">
-        <!-- Crash card -->
-        <div class="bento-card crash-card" onclick="showPage('crash')">
-          <div class="card-tag tag-cyan">
-            <span style="width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulse 1.5s ease infinite;"></span>
-            Live
-          </div>
-          <div class="card-title" style="font-family:var(--font-display);">Crash</div>
-          <div class="card-desc">Ride the multiplier — cash out before it crashes. One moment of hesitation costs everything.</div>
-          <!-- Mini crash graph preview -->
-          <div style="height:80px;position:relative;margin:16px 0;border-bottom:1px solid var(--border);overflow:hidden;">
-            <svg width="100%" height="80" viewBox="0 0 400 80" preserveAspectRatio="none" id="lobby-crash-preview">
-              <defs>
-                <linearGradient id="crashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" style="stop-color:var(--cyan);stop-opacity:0.8"/>
-                  <stop offset="70%" style="stop-color:var(--cyan);stop-opacity:0.8"/>
-                  <stop offset="100%" style="stop-color:var(--pink);stop-opacity:0.8"/>
-                </linearGradient>
-                <linearGradient id="crashFill" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:var(--cyan);stop-opacity:0.3"/>
-                  <stop offset="100%" style="stop-color:transparent;stop-opacity:0"/>
-                </linearGradient>
-              </defs>
-              <path id="preview-path" d="M0,78 Q100,70 200,50 Q300,20 360,0" stroke="url(#crashGrad)" stroke-width="2" fill="none"/>
-              <path id="preview-fill" d="M0,78 Q100,70 200,50 Q300,20 360,0 L360,80 Z" fill="url(#crashFill)"/>
-            </svg>
-            <div style="position:absolute;right:12px;top:8px;font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--cyan);" id="lobby-mult">3.47×</div>
-          </div>
-          <button class="btn btn-cyan" style="width:100%;">Play Crash →</button>
-        </div>
+      <!-- RIGHT: Form -->
+      <div class="auth-right">
+        <div class="auth-form-container">
 
-        <!-- Slots card -->
-        <div class="bento-card slots-card" onclick="showPage('slots')">
-          <div class="card-tag tag-pink">🎰 Slots</div>
-          <div class="card-title">Dream Reels</div>
-          <div class="card-desc">Five reels of psychedelic fortune. Spin to align the cosmos.</div>
-          <div class="reel-preview">
-            <div class="reel-col">
-              <span class="reel-sym">💎</span>
-              <span class="reel-sym">🍋</span>
-              <span class="reel-sym">⭐</span>
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+            <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+          </div>
+
+          <!-- Login Form -->
+          <div class="auth-form-panel active" id="panel-login">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Step back into the dream.</p>
+
+            <div id="login-error" class="error-msg"></div>
+
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="login-email" class="form-input" placeholder="you@example.com" autocomplete="email" />
             </div>
-            <div class="reel-col" style="background:rgba(255,45,120,0.08);border-color:var(--pink-dim);">
-              <span class="reel-sym">💎</span>
-              <span class="reel-sym">💎</span>
-              <span class="reel-sym">💎</span>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="login-password" class="form-input" placeholder="••••••••" autocomplete="current-password" />
             </div>
-            <div class="reel-col">
-              <span class="reel-sym">🔔</span>
-              <span class="reel-sym">🍋</span>
-              <span class="reel-sym">💎</span>
+
+            <button class="btn btn-primary btn-lg" style="width:100%; margin-top:8px;" id="login-btn">
+              Enter the Dream
+            </button>
+
+            <div class="auth-footer">
+              No account? <button onclick="switchTab('register')">Create one</button>
             </div>
           </div>
-          <button class="btn btn-pink" style="width:100%;">Spin Now →</button>
-        </div>
 
-        <!-- Sports card -->
-        <div class="bento-card sports-card">
-          <div class="card-tag tag-green">⚽ Sports</div>
-          <div class="card-title" style="font-size:22px;">Sports Betting</div>
-          <div class="card-desc">Live odds on top leagues. EPL, La Liga, Champions League.</div>
-          <div style="font-size:12px;color:var(--green);margin-top:auto;padding-top:20px;">Coming Soon →</div>
-        </div>
+          <!-- Register Form -->
+          <div class="auth-form-panel" id="panel-register">
+            <h1 class="auth-title">Join the Dream</h1>
+            <p class="auth-subtitle">Your first step into something stranger.</p>
 
-        <!-- Leaderboard -->
-        <div class="bento-card leaderboard-card">
-          <div class="card-tag tag-gold">🏆 Leaderboard</div>
-          <div class="card-title" style="font-size:22px;margin-bottom:20px;">Top Winners</div>
-          <div id="lobby-leaderboard">
-            <div class="lb-row">
-              <div class="lb-rank gold">1</div>
-              <div class="lb-avatar">PK</div>
-              <div class="lb-name">phantom_king</div>
-              <div class="lb-amount">+$24,800</div>
+            <div id="register-error" class="error-msg"></div>
+            <div id="register-success" class="success-msg"></div>
+
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input type="text" id="reg-username" class="form-input" placeholder="your dream name" autocomplete="username" />
             </div>
-            <div class="lb-row">
-              <div class="lb-rank silver">2</div>
-              <div class="lb-avatar" style="background:linear-gradient(135deg,var(--pink),var(--violet));">NX</div>
-              <div class="lb-name">neon_fox</div>
-              <div class="lb-amount">+$18,320</div>
+
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" autocomplete="email" />
             </div>
-            <div class="lb-row">
-              <div class="lb-rank bronze">3</div>
-              <div class="lb-avatar" style="background:linear-gradient(135deg,var(--gold),#d97706);">VS</div>
-              <div class="lb-name">void_star</div>
-              <div class="lb-amount">+$12,050</div>
+
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" id="reg-password" class="form-input" placeholder="••••••••" autocomplete="new-password" />
             </div>
-            <div class="lb-row">
-              <div class="lb-rank">4</div>
-              <div class="lb-avatar" style="background:linear-gradient(135deg,#1e40af,#7c3aed);">CW</div>
-              <div class="lb-name">cyber_wolf</div>
-              <div class="lb-amount">+$9,400</div>
+
+            <button class="btn btn-primary btn-lg" style="width:100%; margin-top:8px;" id="register-btn">
+              Begin the Journey
+            </button>
+
+            <div class="auth-footer">
+              Already dreaming? <button onclick="switchTab('login')">Sign in</button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── CRASH PAGE ── -->
-  <div class="page" id="crash-page">
-    <!-- Main game area -->
-    <div class="crash-main">
-      <div id="crash-canvas-wrap">
-        <canvas id="crash-canvas"></canvas>
-        <div class="crash-multiplier waiting" id="crash-mult-display">WAITING...</div>
-      </div>
-
-      <div class="crash-status-bar">
-        <div class="crash-phase-pill phase-waiting" id="crash-phase-badge">Waiting for next round</div>
-        <div style="font-family:var(--font-mono);font-size:13px;color:var(--text-muted);">
-          Round <span id="crash-round-num">#???</span>
-        </div>
-        <div style="margin-left:auto;font-size:13px;color:var(--text-dim);" id="crash-history-strip"></div>
-      </div>
-
-      <!-- Cash out button — huge, accessible -->
-      <button class="cashout-btn" id="cashout-btn" disabled onclick="crashCashOut()">
-        CASH OUT
-        <span class="sub" id="cashout-sub">Place a bet to play</span>
-      </button>
-    </div>
-
-    <!-- Sidebar -->
-    <div class="crash-sidebar">
-      <!-- Bet panel -->
-      <div class="crash-bet-panel">
-        <h3>Place Bet</h3>
-        <div class="bet-amount-input">
-          <span class="currency">$</span>
-          <input type="number" class="input" id="crash-bet-input" value="10" min="1" max="10000" placeholder="Bet amount">
-        </div>
-        <div class="quick-bets">
-          <div class="quick-bet" onclick="setCrashBet(5)">$5</div>
-          <div class="quick-bet" onclick="setCrashBet(10)">$10</div>
-          <div class="quick-bet" onclick="setCrashBet(25)">$25</div>
-          <div class="quick-bet" onclick="setCrashBet(50)">$50</div>
-          <div class="quick-bet" onclick="setCrashBet(100)">$100</div>
-          <div class="quick-bet" onclick="crashBetMax()">MAX</div>
-        </div>
-        <div class="auto-cashout-row">
-          <label>Auto Cash Out at</label>
-          <input type="number" class="input" id="crash-auto-cashout" placeholder="e.g. 2.00" step="0.1" min="1.01">
-        </div>
-        <button class="place-bet-btn" id="crash-place-btn" onclick="placeCrashBet()">
-          BET — WAITING
-        </button>
-      </div>
-
-      <!-- Live bets table -->
-      <div class="bets-live-table">
-        <h3>Live Bets</h3>
-        <div class="bets-table-row header">
-          <span>Player</span><span>Bet</span><span>Mult</span>
-        </div>
-        <div id="crash-bets-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── SLOTS PAGE ── -->
-  <div class="page" id="slots-page">
-    <div style="max-width:860px;margin:0 auto;padding:0 24px 32px;">
-      <div class="slots-machine">
-        <div class="slots-title">✦ Dream Reels ✦</div>
-
-        <!-- Win display -->
-        <div class="slots-win-display">
-          <div class="win-amount" id="slots-win-display">+$0.00</div>
-          <div class="no-win-text" id="slots-no-win">Spin to play...</div>
-        </div>
-
-        <!-- Reels -->
-        <div class="reels-wrap" id="reels-wrap">
-          <!-- 5 reels generated by JS -->
-        </div>
-        <div class="win-line" id="win-line"></div>
-
-        <!-- Controls -->
-        <div class="slots-controls">
-          <div class="bet-controls">
-            <label>BET</label>
-            <button class="bet-adj" onclick="adjustBet(-5)">−</button>
-            <span class="bet-num" id="slots-bet-display">$10</span>
-            <button class="bet-adj" onclick="adjustBet(5)">+</button>
-          </div>
-          <button id="spin-btn" onclick="spinReels()">SPIN</button>
-          <div class="bet-controls">
-            <label>LINES</label>
-            <span class="bet-num font-mono" style="color:var(--cyan);">9</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Payouts table -->
-      <div class="payouts-table">
-        <h3>Payout Table</h3>
-        <div class="payout-row">
-          <span class="payout-syms">💎💎💎</span>
-          <span class="payout-mult">× 100</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">⭐⭐⭐</span>
-          <span class="payout-mult">× 50</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">🔔🔔🔔</span>
-          <span class="payout-mult">× 25</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">🍒🍒🍒</span>
-          <span class="payout-mult">× 15</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">🍋🍋🍋</span>
-          <span class="payout-mult">× 10</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">🍇🍇🍇</span>
-          <span class="payout-mult">× 5</span>
-        </div>
-        <div class="payout-row">
-          <span class="payout-syms">7️⃣7️⃣7️⃣</span>
-          <span class="payout-mult" style="color:var(--cyan);">× 200</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Auth Modal -->
-<div id="auth-overlay" onclick="closeAuthIfBg(event)">
-  <div id="auth-modal">
-    <div class="auth-tab-bar">
-      <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
-      <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
-    </div>
-
-    <!-- Login form -->
-    <div class="auth-form active" id="login-form">
-      <div class="form-group">
-        <label class="form-label">Username</label>
-        <input type="text" class="input" id="login-username" placeholder="your_username" autocomplete="username">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="input" id="login-password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <div class="form-error" id="login-error"></div>
-      <button class="btn btn-cyan" style="width:100%;margin-top:24px;padding:16px;" id="login-submit" onclick="doLogin()">
-        Enter the Dream
-      </button>
-    </div>
-
-    <!-- Register form -->
-    <div class="auth-form" id="register-form">
-      <div class="form-group">
-        <label class="form-label">Username</label>
-        <input type="text" class="input" id="reg-username" placeholder="choose_username" autocomplete="username">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="input" id="reg-email" placeholder="you@example.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" class="input" id="reg-password" placeholder="••••••••" autocomplete="new-password">
-      </div>
-      <div class="form-error" id="reg-error"></div>
-      <button class="btn btn-pink" style="width:100%;margin-top:24px;padding:16px;" id="reg-submit" onclick="doRegister()">
-        Create Account
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast notification -->
-<div id="toast"></div>
-
-<script>
-// ═══════════════════════════════════════════════════════════
-//  BACKGROUND — Lava Lamp
-// ═══════════════════════════════════════════════════════════
-(function() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, blobs = [];
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function mkBlob() {
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: 150 + Math.random() * 250,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      hue: Math.random() < 0.33 ? 'cyan' : Math.random() < 0.5 ? 'pink' : 'violet',
-      phase: Math.random() * Math.PI * 2,
-      speed: 0.001 + Math.random() * 0.003,
-    };
-  }
-
-  function init() {
-    resize();
-    blobs = Array.from({length: 7}, mkBlob);
-  }
-
-  const colors = {
-    cyan: [0, 245, 255],
-    pink: [255, 45, 120],
-    violet: [124, 58, 237],
-  };
-
-  function draw(t) {
-    ctx.clearRect(0, 0, W, H);
-
-    for (const b of blobs) {
-      b.phase += b.speed;
-      b.x += b.vx + Math.sin(b.phase) * 0.3;
-      b.y += b.vy + Math.cos(b.phase * 0.7) * 0.3;
-      if (b.x < -b.r) b.x = W + b.r;
-      if (b.x > W + b.r) b.x = -b.r;
-      if (b.y < -b.r) b.y = H + b.r;
-      if (b.y > H + b.r) b.y = -b.r;
-
-      const [r, g, bl] = colors[b.hue];
-      const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
-      grad.addColorStop(0, `rgba(${r},${g},${bl},0.07)`);
-      grad.addColorStop(1, `rgba(${r},${g},${bl},0)`);
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-    }
-    requestAnimationFrame(draw);
-  }
-
-  init();
-  window.addEventListener('resize', resize);
-  requestAnimationFrame(draw);
-})();
-
-// ═══════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════
-let token = localStorage.getItem('casino_token') || null;
-let username = localStorage.getItem('casino_user') || null;
-let balance = 0;
-let currentPage = 'lobby';
-
-// Crash state
-let crashWS = null;
-let crashPhase = 'waiting'; // waiting | flying | crashed
-let crashMultiplier = 1.0;
-let crashBetPlaced = false;
-let crashBetAmount = 0;
-let crashCashedOut = false;
-let crashPoints = [];
-let crashBets = [];
-let crashHistory = [];
-let crashRound = 0;
-let animFrame = null;
-let lastMult = 1.0;
-let autoCashout = 0;
-
-// Slots state
-let slotsBet = 10;
-let slotsSpinning = false;
-const SYMBOLS = ['💎','7️⃣','⭐','🔔','🍒','🍋','🍇'];
-const WEIGHTS  = [2, 1, 4, 5, 6, 8, 8];
-const PAYOUTS  = { '💎':100, '7️⃣':200, '⭐':50, '🔔':25, '🍒':15, '🍋':10, '🍇':5 };
-const REELS_N = 5;
-const ROWS_N = 3;
-
-// ═══════════════════════════════════════════════════════════
-//  UTILITY
-// ═══════════════════════════════════════════════════════════
-function showToast(msg, type = 'info', duration = 3000) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), duration);
-}
-
-function fmt$(n) { return '$' + parseFloat(n).toFixed(2); }
-function fmtMult(n) { return n.toFixed(2) + '×'; }
-
-async function apiFetch(url, opts = {}) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(url, { ...opts, headers: { ...headers, ...(opts.headers || {}) } });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || data.error || 'Error');
-  return data;
-}
-
-// ═══════════════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════════════
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-
-  document.getElementById(page + '-page').classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(l => {
-    if (l.textContent.toLowerCase() === page) l.classList.add('active');
-  });
-  currentPage = page;
-
-  if (page === 'crash') initCrash();
-  if (page === 'slots') initSlots();
-}
-
-// ═══════════════════════════════════════════════════════════
-//  AUTH
-// ═══════════════════════════════════════════════════════════
-function openAuth() { document.getElementById('auth-overlay').classList.add('active'); }
-function closeAuth() { document.getElementById('auth-overlay').classList.remove('active'); }
-function closeAuthIfBg(e) { if (e.target === document.getElementById('auth-overlay')) closeAuth(); }
-
-function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
-  });
-  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-  document.getElementById(tab + '-form').classList.add('active');
-}
-
-async function doLogin() {
-  const btn = document.getElementById('login-submit');
-  const err = document.getElementById('login-error');
-  const u = document.getElementById('login-username').value.trim();
-  const p = document.getElementById('login-password').value;
-  if (!u || !p) { err.textContent = 'Fill in all fields.'; return; }
-  btn.textContent = '...'; btn.disabled = true;
-  try {
-    const d = await apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
-    token = d.token; username = u;
-    localStorage.setItem('casino_token', token);
-    localStorage.setItem('casino_user', username);
-    err.textContent = '';
-    closeAuth();
-    onLoggedIn();
-  } catch (ex) {
-    err.textContent = ex.message;
-  } finally { btn.textContent = 'Enter the Dream'; btn.disabled = false; }
-}
-
-async function doRegister() {
-  const btn = document.getElementById('reg-submit');
-  const err = document.getElementById('reg-error');
-  const u = document.getElementById('reg-username').value.trim();
-  const e = document.getElementById('reg-email').value.trim();
-  const p = document.getElementById('reg-password').value;
-  if (!u || !e || !p) { err.textContent = 'Fill in all fields.'; return; }
-  btn.textContent = '...'; btn.disabled = true;
-  try {
-    await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ username: u, email: e, password: p }) });
-    err.textContent = '';
-    showToast('Account created! Please login.', 'success');
-    switchAuthTab('login');
-    document.getElementById('login-username').value = u;
-  } catch (ex) {
-    err.textContent = ex.message;
-  } finally { btn.textContent = 'Create Account'; btn.disabled = false; }
-}
-
-function logout() {
-  token = null; username = null; balance = 0;
-  localStorage.removeItem('casino_token');
-  localStorage.removeItem('casino_user');
-  onLoggedOut();
-}
-
-async function onLoggedIn() {
-  document.getElementById('auth-btn').style.display = 'none';
-  document.getElementById('logout-btn').style.display = 'flex';
-  document.getElementById('balance-display').style.display = 'flex';
-  showToast(`Welcome back, ${username}!`, 'success');
-  await fetchBalance();
-}
-
-function onLoggedOut() {
-  document.getElementById('auth-btn').style.display = 'flex';
-  document.getElementById('logout-btn').style.display = 'none';
-  document.getElementById('balance-display').style.display = 'none';
-  showPage('lobby');
-}
-
-async function fetchBalance() {
-  if (!token) return;
-  try {
-    const d = await apiFetch('/api/wallet/balance');
-    balance = parseFloat(d.balance);
-    document.getElementById('balance-amount').textContent = fmt$(balance);
-  } catch (_) {}
-}
-
-// ═══════════════════════════════════════════════════════════
-//  CRASH GAME
-// ═══════════════════════════════════════════════════════════
-function initCrash() {
-  if (!crashWS || crashWS.readyState > 1) connectCrashWS();
-  renderCrashBets();
-  drawCrashCanvas();
-}
-
-function connectCrashWS() {
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${location.host}`;
-  try {
-    crashWS = new WebSocket(wsUrl);
-    crashWS.onopen = () => {
-      crashWS.send(JSON.stringify({ type: 'join_crash' }));
-    };
-    crashWS.onmessage = (ev) => {
-      try { handleCrashMsg(JSON.parse(ev.data)); } catch(_) {}
-    };
-    crashWS.onclose = () => {
-      setTimeout(() => { if (currentPage === 'crash') connectCrashWS(); }, 3000);
-    };
-    crashWS.onerror = () => {};
-  } catch(_) {}
-}
-
-function handleCrashMsg(msg) {
-  switch (msg.type) {
-    case 'game_start':
-    case 'game_starting':
-      crashPhase = 'waiting';
-      crashMultiplier = 1.0;
-      crashPoints = [];
-      crashBets = msg.bets || [];
-      crashRound = msg.round || crashRound + 1;
-      crashCashedOut = false;
-      updateCrashUI();
-      renderCrashBets();
-      setTimeout(() => {
-        crashPhase = 'flying';
-        updateCrashUI();
-      }, 3000);
-      break;
-    case 'game_tick':
-    case 'multiplier_update':
-      if (crashPhase === 'flying') {
-        crashMultiplier = parseFloat(msg.multiplier || msg.value || 1);
-        lastMult = crashMultiplier;
-        crashPoints.push(crashMultiplier);
-        updateCrashMultiplierDisplay();
-        // Auto cashout
-        if (crashBetPlaced && !crashCashedOut && autoCashout > 0 && crashMultiplier >= autoCashout) {
-          crashCashOut();
-        }
-      }
-      break;
-    case 'game_crash':
-    case 'crash':
-      crashPhase = 'crashed';
-      crashMultiplier = parseFloat(msg.multiplier || msg.value || crashMultiplier);
-      crashHistory.unshift(crashMultiplier);
-      if (crashHistory.length > 10) crashHistory.pop();
-      if (crashBetPlaced && !crashCashedOut) {
-        showToast(`Crashed at ${fmtMult(crashMultiplier)} — You lost ${fmt$(crashBetAmount)}`, 'error', 4000);
-        crashBetPlaced = false;
-      }
-      updateCrashUI();
-      setTimeout(() => {
-        crashPhase = 'waiting';
-        updateCrashUI();
-      }, 5000);
-      break;
-    case 'player_cashed_out':
-      const bet = crashBets.find(b => b.username === msg.username);
-      if (bet) {
-        bet.cashedOut = true;
-        bet.cashoutMult = msg.multiplier;
-        renderCrashBets();
-      }
-      break;
-  }
-}
-
-function updateCrashUI() {
-  const multEl = document.getElementById('crash-mult-display');
-  const badge = document.getElementById('crash-phase-badge');
-  const placeBtn = document.getElementById('crash-place-btn');
-
-  if (crashPhase === 'waiting') {
-    multEl.className = 'crash-multiplier waiting';
-    multEl.textContent = 'WAITING...';
-    badge.className = 'crash-phase-pill phase-waiting';
-    badge.textContent = 'Waiting for next round';
-    placeBtn.disabled = false;
-    placeBtn.textContent = 'PLACE BET';
-    document.getElementById('cashout-btn').disabled = true;
-    document.getElementById('cashout-sub').textContent = 'Place a bet to play';
-    crashPoints = [];
-  } else if (crashPhase === 'flying') {
-    badge.className = 'crash-phase-pill phase-flying';
-    badge.textContent = '🚀 In Progress';
-    if (crashBetPlaced && !crashCashedOut) {
-      document.getElementById('cashout-btn').disabled = false;
-    }
-    placeBtn.disabled = true;
-    placeBtn.textContent = 'Round in progress';
-  } else if (crashPhase === 'crashed') {
-    multEl.className = 'crash-multiplier crashed';
-    badge.className = 'crash-phase-pill phase-crashed';
-    badge.textContent = `💥 Crashed at ${fmtMult(crashMultiplier)}`;
-    document.getElementById('cashout-btn').disabled = true;
-    placeBtn.disabled = true;
-    placeBtn.textContent = 'NEXT ROUND...';
-  }
-
-  document.getElementById('crash-round-num').textContent = `#${crashRound}`;
-  // History strip
-  document.getElementById('crash-history-strip').innerHTML = crashHistory
-    .slice(0, 8).map(m => `<span style="margin-left:8px;font-family:var(--font-mono);font-size:12px;color:${m < 2 ? 'var(--pink)' : 'var(--cyan)'}">${m.toFixed(2)}×</span>`)
-    .join('');
-
-  updateCrashMultiplierDisplay();
-  drawCrashCanvas();
-}
-
-function updateCrashMultiplierDisplay() {
-  const el = document.getElementById('crash-mult-display');
-  if (crashPhase === 'flying') {
-    el.className = 'crash-multiplier flying';
-    el.textContent = fmtMult(crashMultiplier);
-    // Update cashout button value
-    if (crashBetPlaced && !crashCashedOut) {
-      document.getElementById('cashout-sub').textContent =
-        `Cash out ${fmt$(crashBetAmount * crashMultiplier)}`;
-    }
-  }
-  drawCrashCanvas();
-}
-
-const crashCanvas = document.getElementById('crash-canvas');
-const crashCtx = crashCanvas.getContext('2d');
-
-function drawCrashCanvas() {
-  const wrap = document.getElementById('crash-canvas-wrap');
-  const W = wrap.clientWidth || 600;
-  const H = wrap.clientHeight || 340;
-  crashCanvas.width = W;
-  crashCanvas.height = H;
-
-  crashCtx.clearRect(0, 0, W, H);
-
-  const pad = { left: 50, right: 20, top: 20, bottom: 40 };
-  const gW = W - pad.left - pad.right;
-  const gH = H - pad.top - pad.bottom;
-
-  // Grid lines
-  crashCtx.strokeStyle = 'rgba(255,255,255,0.05)';
-  crashCtx.lineWidth = 1;
-  for (let i = 1; i <= 5; i++) {
-    const y = pad.top + gH - (gH * i / 5);
-    crashCtx.beginPath();
-    crashCtx.moveTo(pad.left, y);
-    crashCtx.lineTo(W - pad.right, y);
-    crashCtx.stroke();
-    crashCtx.fillStyle = 'rgba(255,255,255,0.2)';
-    crashCtx.font = '11px DM Mono, monospace';
-    crashCtx.fillText((i + 1) + '×', 4, y + 4);
-  }
-  // Axes
-  crashCtx.strokeStyle = 'rgba(255,255,255,0.15)';
-  crashCtx.beginPath();
-  crashCtx.moveTo(pad.left, pad.top);
-  crashCtx.lineTo(pad.left, H - pad.bottom);
-  crashCtx.lineTo(W - pad.right, H - pad.bottom);
-  crashCtx.stroke();
-
-  if (crashPoints.length < 2) return;
-
-  const maxMult = Math.max(...crashPoints, 2);
-  const pts = crashPoints.map((m, i) => ({
-    x: pad.left + (i / (crashPoints.length - 1)) * gW,
-    y: pad.top + gH - ((m - 1) / (maxMult - 1)) * gH,
-  }));
-
-  // Fill under curve
-  const color = crashPhase === 'crashed' ? [255,45,120] : [0,245,255];
-  const grad = crashCtx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
-  grad.addColorStop(0, `rgba(${color[0]},${color[1]},${color[2]},0.3)`);
-  grad.addColorStop(1, `rgba(${color[0]},${color[1]},${color[2]},0)`);
-
-  crashCtx.beginPath();
-  crashCtx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) crashCtx.lineTo(pts[i].x, pts[i].y);
-  crashCtx.lineTo(pts[pts.length-1].x, H - pad.bottom);
-  crashCtx.lineTo(pts[0].x, H - pad.bottom);
-  crashCtx.closePath();
-  crashCtx.fillStyle = grad;
-  crashCtx.fill();
-
-  // Curve line
-  crashCtx.beginPath();
-  crashCtx.moveTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length; i++) crashCtx.lineTo(pts[i].x, pts[i].y);
-  crashCtx.strokeStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-  crashCtx.lineWidth = 3;
-  crashCtx.shadowColor = `rgba(${color[0]},${color[1]},${color[2]},0.8)`;
-  crashCtx.shadowBlur = 15;
-  crashCtx.stroke();
-  crashCtx.shadowBlur = 0;
-
-  // Rocket dot at end
-  if (crashPhase === 'flying' && pts.length > 0) {
-    const last = pts[pts.length - 1];
-    crashCtx.beginPath();
-    crashCtx.arc(last.x, last.y, 6, 0, Math.PI * 2);
-    crashCtx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},1)`;
-    crashCtx.shadowColor = `rgba(${color[0]},${color[1]},${color[2]},1)`;
-    crashCtx.shadowBlur = 20;
-    crashCtx.fill();
-    crashCtx.shadowBlur = 0;
-  }
-}
-
-async function placeCrashBet() {
-  if (!token) { openAuth(); return; }
-  if (crashPhase !== 'waiting') { showToast('Wait for next round!', 'error'); return; }
-  const amt = parseFloat(document.getElementById('crash-bet-input').value);
-  if (!amt || amt < 1) { showToast('Enter a valid bet amount', 'error'); return; }
-  if (amt > balance) { showToast('Insufficient balance', 'error'); return; }
-
-  autoCashout = parseFloat(document.getElementById('crash-auto-cashout').value) || 0;
-
-  try {
-    await apiFetch('/api/crash/bet', { method: 'POST', body: JSON.stringify({ amount: amt }) });
-    crashBetAmount = amt;
-    crashBetPlaced = true;
-    crashCashedOut = false;
-    balance -= amt;
-    document.getElementById('balance-amount').textContent = fmt$(balance);
-    document.getElementById('crash-place-btn').textContent = 'BET PLACED ✓';
-    document.getElementById('crash-place-btn').disabled = true;
-    showToast(`Bet placed: ${fmt$(amt)}`, 'success');
-  } catch (ex) {
-    // Simulate for demo if backend not configured
-    crashBetAmount = amt;
-    crashBetPlaced = true;
-    crashCashedOut = false;
-    document.getElementById('crash-place-btn').textContent = 'BET PLACED ✓';
-    document.getElementById('crash-place-btn').disabled = true;
-    showToast(`Bet placed: ${fmt$(amt)}`, 'success');
-  }
-}
-
-async function crashCashOut() {
-  if (!crashBetPlaced || crashCashedOut || crashPhase !== 'flying') return;
-  crashCashedOut = true;
-  const won = crashBetAmount * crashMultiplier;
-  document.getElementById('cashout-btn').disabled = true;
-  try {
-    await apiFetch('/api/crash/cashout', { method: 'POST' });
-  } catch(_) {}
-  balance += won;
-  document.getElementById('balance-amount').textContent = fmt$(balance);
-  document.getElementById('cashout-sub').textContent = `Cashed out at ${fmtMult(crashMultiplier)}!`;
-  showToast(`🎉 Cashed out ${fmt$(won)} at ${fmtMult(crashMultiplier)}!`, 'success', 5000);
-  crashBetPlaced = false;
-}
-
-function setCrashBet(n) { document.getElementById('crash-bet-input').value = n; }
-function crashBetMax() { document.getElementById('crash-bet-input').value = Math.floor(balance); }
-
-function renderCrashBets() {
-  const el = document.getElementById('crash-bets-list');
-  const fakeBets = [
-    { username: 'phantom_k', amount: 50, cashedOut: true, cashoutMult: 2.34 },
-    { username: 'neon_fox', amount: 25, cashedOut: false },
-    { username: 'void_s', amount: 100, cashedOut: true, cashoutMult: 1.87 },
-    { username: 'cyber_w', amount: 15, cashedOut: false },
-  ];
-  const bets = crashBets.length ? crashBets : fakeBets;
-  el.innerHTML = bets.slice(0, 8).map(b => `
-    <div class="bets-table-row">
-      <span style="color:var(--text-muted)">${b.username || b.player || '?'}</span>
-      <span class="font-mono">${fmt$(b.amount || b.bet || 0)}</span>
-      <span class="${b.cashedOut ? 'bet-won font-mono' : b.lost ? 'bet-lost font-mono' : 'bet-active font-mono'}">
-        ${b.cashedOut ? fmtMult(b.cashoutMult || 1) : b.lost ? '💥' : '—'}
-      </span>
-    </div>
-  `).join('');
-}
-
-// Simulate crash game if no WS
-(function simulateCrash() {
-  let phase = 'waiting';
-  let mult = 1.0;
-  let pts = [];
-  let crashAt = 0;
-  let ticker = null;
-
-  function startRound() {
-    phase = 'waiting';
-    mult = 1.0;
-    pts = [];
-    crashAt = 1.5 + Math.random() * 8;
-    handleCrashMsg({ type: 'game_start', round: crashRound + 1 });
-
-    setTimeout(() => {
-      phase = 'flying';
-      crashPhase = 'flying';
-      updateCrashUI();
-      ticker = setInterval(() => {
-        mult += 0.03 + mult * 0.01;
-        pts.push(mult);
-        handleCrashMsg({ type: 'game_tick', multiplier: mult });
-        if (mult >= crashAt) {
-          clearInterval(ticker);
-          handleCrashMsg({ type: 'game_crash', multiplier: mult });
-          setTimeout(startRound, 5000);
-        }
-      }, 100);
-    }, 4000);
-  }
-
-  startRound();
-})();
-
-// ═══════════════════════════════════════════════════════════
-//  SLOTS
-// ═══════════════════════════════════════════════════════════
-function initSlots() {
-  const wrap = document.getElementById('reels-wrap');
-  if (wrap.children.length > 0) return;
-
-  for (let r = 0; r < REELS_N; r++) {
-    const reel = document.createElement('div');
-    reel.className = 'reel';
-    reel.id = `reel-${r}`;
-    const track = document.createElement('div');
-    track.className = 'reel-track';
-    track.id = `track-${r}`;
-    // Fill track with random symbols (enough for scrolling)
-    for (let i = 0; i < 30; i++) {
-      const sym = document.createElement('div');
-      sym.className = 'reel-symbol';
-      sym.textContent = randSymbol();
-      track.appendChild(sym);
-    }
-    reel.appendChild(track);
-    wrap.appendChild(reel);
-  }
-  updateSlotsDisplay();
-}
-
-function randSymbol() {
-  const total = WEIGHTS.reduce((a, b) => a + b, 0);
-  let r = Math.random() * total;
-  for (let i = 0; i < SYMBOLS.length; i++) {
-    r -= WEIGHTS[i];
-    if (r < 0) return SYMBOLS[i];
-  }
-  return SYMBOLS[0];
-}
-
-function adjustBet(delta) {
-  slotsBet = Math.max(1, Math.min(1000, slotsBet + delta));
-  updateSlotsDisplay();
-}
-
-function updateSlotsDisplay() {
-  document.getElementById('slots-bet-display').textContent = fmt$(slotsBet);
-}
-
-async function spinReels() {
-  if (slotsSpinning) return;
-  if (!token) { openAuth(); return; }
-  if (slotsBet > balance) { showToast('Insufficient balance', 'error'); return; }
-
-  slotsSpinning = true;
-  const btn = document.getElementById('spin-btn');
-  btn.disabled = true;
-  btn.textContent = '...';
-
-  document.getElementById('slots-win-display').classList.remove('show');
-  document.getElementById('slots-no-win').textContent = 'Spinning...';
-  document.getElementById('win-line').classList.remove('visible');
-
-  // Deduct bet optimistically
-  balance -= slotsBet;
-  document.getElementById('balance-amount').textContent = fmt$(balance);
-
-  let result;
-  try {
-    result = await apiFetch('/api/slots/play', { method: 'POST', body: JSON.stringify({ bet: slotsBet }) });
-  } catch (_) {
-    // Simulate locally
-    result = simulateSlots(slotsBet);
-  }
-
-  // Animate reels
-  await animateReels(result.grid || result.reels || generateGrid());
-
-  // Show result
-  const win = parseFloat(result.win || result.winAmount || 0);
-  if (win > 0) {
-    balance += win;
-    document.getElementById('balance-amount').textContent = fmt$(balance);
-    document.getElementById('slots-win-display').textContent = `✦ WIN ${fmt$(win)} ✦`;
-    document.getElementById('slots-win-display').classList.add('show');
-    document.getElementById('slots-no-win').textContent = '';
-    document.getElementById('win-line').classList.add('visible');
-    showToast(`You won ${fmt$(win)}!`, 'success');
-  } else {
-    document.getElementById('slots-no-win').textContent = 'No win this time...';
-  }
-
-  slotsSpinning = false;
-  btn.disabled = false;
-  btn.textContent = 'SPIN';
-}
-
-function generateGrid() {
-  return Array.from({length: REELS_N}, () => Array.from({length: ROWS_N}, () => randSymbol()));
-}
-
-function simulateSlots(bet) {
-  const grid = generateGrid();
-  // Check middle row win
-  const midRow = grid.map(col => col[1]);
-  const first = midRow[0];
-  let matchLen = 1;
-  for (let i = 1; i < midRow.length; i++) {
-    if (midRow[i] === first) matchLen++;
-    else break;
-  }
-  let win = 0;
-  if (matchLen >= 3) {
-    const mult = PAYOUTS[first] || 1;
-    win = bet * mult * (matchLen / REELS_N);
-  }
-  return { grid, win };
-}
-
-function animateReels(grid) {
-  return new Promise(resolve => {
-    const reels = REELS_N;
-    let done = 0;
-
-    for (let r = 0; r < reels; r++) {
-      const track = document.getElementById(`track-${r}`);
-      const targetCol = grid[r];
-      const delay = r * 120;
-
-      setTimeout(() => {
-        // Fast scroll animation
-        let scrolled = 0;
-        const totalScroll = 1200 + r * 200;
-        let speed = 20;
-        const SYMH = 120;
-
-        const tick = () => {
-          scrolled += speed;
-          speed = Math.max(2, speed * (scrolled > totalScroll * 0.7 ? 0.95 : 1));
-          track.style.transform = `translateY(-${scrolled % (SYMH * track.children.length)}px)`;
-
-          if (scrolled < totalScroll) {
-            requestAnimationFrame(tick);
-          } else {
-            // Set final symbols (top 3 = rows)
-            const children = Array.from(track.children);
-            // Reset to show target column
-            children.forEach((c, i) => {
-              c.textContent = targetCol[i % ROWS_N] || targetCol[0];
-            });
-            track.style.transform = 'translateY(0)';
-
-            done++;
-            if (done === reels) setTimeout(resolve, 200);
-          }
-        };
-        requestAnimationFrame(tick);
-      }, delay);
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════════
-//  LOBBY ANIMATION
-// ═══════════════════════════════════════════════════════════
-(function animateLobbyMult() {
-  let m = 1.0;
-  const el = document.getElementById('lobby-mult');
-  if (!el) return;
-  setInterval(() => {
-    m += 0.05 + m * 0.02;
-    if (m > 8) m = 1.0;
-    el.textContent = fmtMult(m);
-  }, 200);
-})();
-
-// ═══════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════
-window.addEventListener('load', () => {
-  if (token) {
-    onLoggedIn();
-  }
-  // Animate stat counter
-  animateCounter('stat-players', 2847, 3000);
-});
-
-function animateCounter(id, target, duration) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let start = null;
-  const base = Math.floor(target * 0.6);
-  function step(ts) {
-    if (!start) start = ts;
-    const progress = Math.min((ts - start) / duration, 1);
-    el.textContent = Math.floor(base + (target - base) * progress).toLocaleString();
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-</script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
 </body>
 </html>

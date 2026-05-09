@@ -22,7 +22,17 @@ const { crashClients, startGameLoop } = require('./src/controllers/crashControll
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'pages')));
+
+// ✅ FIX: Serve the entire project root so that:
+//   - /pages/index.html is accessible
+//   - /css/main.css is accessible (referenced as ../css/main.css from pages/)
+//   - /js/api.js is accessible (referenced as ../js/api.js from pages/)
+app.use(express.static(path.join(__dirname)));
+
+// Redirect root "/" to the login page
+app.get('/', (req, res) => {
+  res.redirect('/pages/index.html');
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/wallet', walletRoutes);
@@ -53,7 +63,7 @@ wss.on('connection', (ws) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Casino server running on port ${PORT}`);
+    console.log(`🎰 Casino server running on http://localhost:${PORT}`);
     startGameLoop(wss);
 });
 
