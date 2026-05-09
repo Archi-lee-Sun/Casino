@@ -10,15 +10,15 @@ const headers = {
 
 const getUpcomingMatches = async () => {
     try {
+        const today = new Date().toISOString().split('T')[0];
         const response = await axios.get(`${BASE_URL}/fixtures`, {
-            params : {
-                next : 10
-            } ,
+            params: {
+                date: today
+            },
             headers
-        })
-
+        });
         return response.data.response;
-    } catch (error){
+    } catch (error) {
         console.error('Error fetching upcoming matches:', error);
         throw error;
     }
@@ -37,10 +37,22 @@ const getMatchOdds = async (fixtureId) => {
     }
 }
 
-
+const getMatchResult = async (fixtureId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/fixtures`, {
+            params: { id: fixtureId },
+            headers
+        });
+        return response.data.response[0];
+    } catch (error) {
+        console.error('Error fetching match result:', error);
+        throw error;
+    }
+}
 
 
 module.exports = {
     getUpcomingMatches,
-    getMatchOdds
+    getMatchOdds,
+    getMatchResult
 }
